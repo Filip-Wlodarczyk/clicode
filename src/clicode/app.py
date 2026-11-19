@@ -30,7 +30,7 @@ from clicode.ui.top_bar import TopBar
 
 
 class CliCodeApp(App):
-    """Główna aplikacja edytora CLI Code."""
+    """Main application of the CLI Code editor."""
 
     TITLE = "CLI Code"
     CSS = """
@@ -50,16 +50,16 @@ class CliCodeApp(App):
     """
 
     BINDINGS = [
-        Binding("ctrl+q", "quit", "Wyjdź", show=True),
-        Binding("ctrl+s", "save_file", "Zapisz", show=True),
-        Binding("ctrl+p", "open_file_finder", "Szukaj pliku", show=True),
-        Binding("ctrl+b", "toggle_sidebar", "Pasek boczny", show=True),
-        Binding("ctrl+t", "toggle_bottom_panel", "Panel dolny", show=True),
-        Binding("ctrl+space", "activate_leader", "Menu Lidera", show=True),
-        Binding("f1", "show_help", "Pomoc", show=True),
-        Binding("f2", "select_language", "Język", show=False),
-        Binding("f5", "run_project", "Uruchom", show=False),
-        Binding("escape", "escape_action", "Normal Mode / Zamknij", show=True),
+        Binding("ctrl+q", "quit", "Quit", show=True),
+        Binding("ctrl+s", "save_file", "Save", show=True),
+        Binding("ctrl+p", "open_file_finder", "Find file", show=True),
+        Binding("ctrl+b", "toggle_sidebar", "Sidebar", show=True),
+        Binding("ctrl+t", "toggle_bottom_panel", "Bottom panel", show=True),
+        Binding("ctrl+space", "activate_leader", "Leader Menu", show=True),
+        Binding("f1", "show_help", "Help", show=True),
+        Binding("f2", "select_language", "Language", show=False),
+        Binding("f5", "run_project", "Run", show=False),
+        Binding("escape", "escape_action", "Normal Mode / Close", show=True),
     ]
 
     def __init__(self, target_dir: str | Path | None = None, initial_file: str | Path | None = None):
@@ -78,7 +78,7 @@ class CliCodeApp(App):
         yield TopBar(
             project_name=self.project_dir.name,
             git_info=git_info,
-            file_name="Brak otwartego pliku",
+            file_name="No file open",
             language=self.current_language.capitalize(),
             mode=self.mode,
             id="top-bar",
@@ -90,11 +90,11 @@ class CliCodeApp(App):
                 yield BottomPanel(str(self.project_dir), id="bottom-panel")
 
     def on_mount(self) -> None:
-        # Jeśli podano plik początkowy, otwórz go
+        # If initial file was provided, open it
         if self.initial_file and self.initial_file.is_file():
             self.open_file(self.initial_file)
         else:
-            # Otwórz pierwszy plik w projekcie jeśli istnieje (np. main.py, lib/main.dart)
+            # Open first project file if it exists (e.g. main.py, lib/main.dart)
             candidates = [
                 self.project_dir / "lib" / "main.dart",
                 self.project_dir / "main.py",
@@ -107,18 +107,18 @@ class CliCodeApp(App):
                     self.open_file(c)
                     break
 
-        # Odśwież diagnostykę
+        # Refresh diagnostics
         self.run_current_diagnostics()
 
     def open_file(self, file_path: Path | str) -> None:
-        """Otwiera wskazany plik w edytorze."""
+        """Opens specified file in the editor."""
         p = Path(file_path).resolve()
         editor = self.query_one("#editor", CodeEditor)
         if editor.load_file(p):
             self.current_file_path = p
             self.current_language = editor.current_language
             
-            # Aktualizacja górnego paska
+            # Update top bar
             top = self.query_one("#top-bar", TopBar)
             rel_name = p.name
             top.update_info(
@@ -126,14 +126,14 @@ class CliCodeApp(App):
                 language=self.current_language.capitalize(),
                 is_dirty=False,
             )
-            # Uruchom diagnostykę
+            # Run diagnostics
             self.run_current_diagnostics()
 
     def action_save_file(self) -> None:
-        """Zapisuje bieżący plik."""
+        """Saves current file."""
         editor = self.query_one("#editor", CodeEditor)
         if not self.current_file_path:
-            # Pytanie o nazwę pliku
+            # Ask for file name
             self.action_new_file()
             return
         if editor.save_file(self.current_file_path):
@@ -141,24 +141,24 @@ class CliCodeApp(App):
             git_info = get_git_info(self.project_dir)
             top.update_info(is_dirty=False, git_info=git_info)
             bottom = self.query_one("#bottom-panel", BottomPanel)
-            bottom.log_debug(f"Zapisano plik: {self.current_file_path.name}")
+            bottom.log_debug(f"File saved: {self.current_file_path.name}")
             self.run_current_diagnostics()
 
     def action_escape_action(self) -> None:
-        """Powrót do trybu NORMAL i reset trybu Lidera."""
+        """Return to NORMAL mode and reset leader state."""
         self.is_leader_active = False
         self.set_mode("NORMAL")
-        # Przeniesienie fokusu z pola edycji
+        # Remove focus from editor input
         try:
             self.query_one("#editor", CodeEditor).blur()
         except Exception:
             pass
 
     def action_activate_leader(self) -> None:
-        """Aktywacja menu lidera (Spacja)."""
+        """Activate leader menu (Space)."""
         self.is_leader_active = True
         top = self.query_one("#top-bar", TopBar)
-        top.update_info(mode="SPACJA: [l/r/t/p/w/n/b/h]")
+        top.update_info(mode="SPACE: [l/r/t/p/w/n/b/h]")
 
     def set_mode(self, mode: str) -> None:
         self.mode = mode
@@ -166,16 +166,16 @@ class CliCodeApp(App):
         top.update_info(mode=mode)
 
     def on_key(self, event) -> None:
-        """Obsługa sekwencji klawiszy Spacja + l / r / t / itp."""
+        """Handle Space + l / r / t / etc. key sequences."""
         focused = self.focused
 
-        # Jeśli kursor jest w TextArea w trybie wpisywania, spacja pisze spację,
-        # CHYBA że jesteśmy w trybie NORMAL lub użytkownik nacisnął Ctrl+Space lub leader jest aktywny.
+        # If cursor is in TextArea in typing mode, space inserts a space,
+        # UNLESS we are in NORMAL mode or leader is active.
         is_in_textarea = isinstance(focused, TextArea)
         is_in_input = isinstance(focused, Input)
 
         if self.is_leader_active:
-            # Leader sequence po naciśnięciu Spacji
+            # Leader sequence after pressing Space
             self.is_leader_active = False
             top = self.query_one("#top-bar", TopBar)
             top.update_info(mode=self.mode)
@@ -215,14 +215,14 @@ class CliCodeApp(App):
                 event.stop()
             return
 
-        # Jeśli w trybie NORMAL (poza wpisywaniem w Input) naciśnięto spację:
+        # If in NORMAL mode (and not in an Input) space was pressed:
         if event.key == "space" and not is_in_input and self.mode == "NORMAL":
             self.action_activate_leader()
             event.prevent_default()
             event.stop()
             return
 
-        # Jeśli w trybie NORMAL naciśnięto 'i' w edytorze -> wejdź w EDIT
+        # If in NORMAL mode 'i' was pressed in editor -> switch to EDIT mode
         if self.mode == "NORMAL" and event.key == "i" and not is_in_input:
             self.set_mode("EDIT")
             self.query_one(TextArea).focus()
@@ -231,7 +231,7 @@ class CliCodeApp(App):
             return
 
     def action_select_language(self) -> None:
-        """Otwiera okno wyboru języka (Spacja + l)."""
+        """Opens language selection modal (Space + l)."""
         def _on_lang_picked(lang: str | None) -> None:
             if not lang:
                 return
@@ -241,14 +241,14 @@ class CliCodeApp(App):
             top = self.query_one("#top-bar", TopBar)
             top.update_info(language=lang.capitalize())
             bottom = self.query_one("#bottom-panel", BottomPanel)
-            bottom.log_debug(f"Wybrano język: {lang.capitalize()}")
-            # Odświeżenie diagnostyki z nowym językiem
+            bottom.log_debug(f"Selected language: {lang.capitalize()}")
+            # Refresh diagnostics with new language
             self.run_current_diagnostics()
 
         self.push_screen(LanguagePickerModal(), _on_lang_picked)
 
     def action_run_project(self) -> None:
-        """Otwiera okno uruchamiania projektu (Spacja + r)."""
+        """Opens run project modal (Space + r)."""
         commands = detect_run_commands(self.project_dir, str(self.current_file_path) if self.current_file_path else None)
 
         def _on_command_picked(cmd: str | None) -> None:
@@ -259,7 +259,7 @@ class CliCodeApp(App):
         self.push_screen(RunPickerModal(commands), _on_command_picked)
 
     def action_select_bottom_panel(self) -> None:
-        """Otwiera menu przełączania dolnego panelu (Spacja + t)."""
+        """Opens bottom panel selection modal (Space + t)."""
         def _on_panel_picked(panel: str | None) -> None:
             if not panel:
                 return
@@ -273,7 +273,7 @@ class CliCodeApp(App):
         self.push_screen(BottomPanelPickerModal(), _on_panel_picked)
 
     def action_open_file_finder(self) -> None:
-        """Otwiera szybkie wyszukiwanie plików (Spacja + p)."""
+        """Opens quick file finder (Space + p)."""
         def _on_file_selected(file_path: str | None) -> None:
             if file_path:
                 self.open_file(Path(file_path))
@@ -281,7 +281,7 @@ class CliCodeApp(App):
         self.push_screen(FileFinderModal(self.project_dir), _on_file_selected)
 
     def action_new_file(self) -> None:
-        """Tworzenie nowego pliku (Spacja + n)."""
+        """Create new file (Space + n)."""
         def _on_new_file_entered(filename: str | None) -> None:
             if not filename:
                 return
@@ -294,7 +294,7 @@ class CliCodeApp(App):
                 self.open_file(new_path)
             except Exception as e:
                 bottom = self.query_one("#bottom-panel", BottomPanel)
-                bottom.log_output(f"Błąd tworzenia pliku: {e}", is_error=True)
+                bottom.log_output(f"Error creating file: {e}", is_error=True)
 
         self.push_screen(NewFileModal(), _on_new_file_entered)
 
@@ -311,19 +311,19 @@ class CliCodeApp(App):
     def action_show_help(self) -> None:
         self.push_screen(HelpModal())
 
-    # --- Obsługa zdarzeń z widżetów ---
+    # --- Widget event handlers ---
 
     def on_directory_tree_file_selected(self, event: DirectoryTree.FileSelected) -> None:
-        """Kliknięcie pliku na drzewie plików po lewej."""
+        """Click on file in file tree on the left."""
         self.open_file(event.path)
 
     def on_code_editor_content_changed(self, event: CodeEditor.ContentChanged) -> None:
-        """Zmiana zawartości edytora."""
+        """Editor content changed."""
         top = self.query_one("#top-bar", TopBar)
         top.update_info(is_dirty=event.is_dirty)
 
     def on_bottom_panel_error_selected(self, event: BottomPanel.ErrorSelected) -> None:
-        """Kliknięcie błędu na liście problemów."""
+        """Click on problem row in table."""
         if event.file_path and os.path.exists(event.file_path):
             if not self.current_file_path or Path(event.file_path).resolve() != self.current_file_path.resolve():
                 self.open_file(event.file_path)
@@ -331,14 +331,14 @@ class CliCodeApp(App):
         editor.jump_to(event.line, event.column)
 
     def on_bottom_panel_run_command_requested(self, event: BottomPanel.RunCommandRequested) -> None:
-        """Wykonanie polecenia z paska terminala."""
+        """Execute command from terminal bar."""
         self.execute_command(event.command, target_tab="terminal")
 
-    # --- Zadania w tle (Worker) ---
+    # --- Background tasks (Worker) ---
 
     @work(exclusive=True, group="diagnostics")
     async def run_current_diagnostics(self) -> None:
-        """Uruchamia analizę lintera/kompilatora dla otwartego pliku."""
+        """Runs linter/compiler analysis for the open file."""
         editor = self.query_one("#editor", CodeEditor)
         content = editor.get_text()
         file_path = self.current_file_path
@@ -352,13 +352,13 @@ class CliCodeApp(App):
 
     @work(exclusive=False)
     async def execute_command(self, cmd: str, target_tab: str = "output") -> None:
-        """Asynchronicznie wykonuje polecenie systemowe i przesyła wyjście do panelu."""
+        """Asynchronously runs a system command and streams output to bottom panel."""
         bottom = self.query_one("#bottom-panel", BottomPanel)
         bottom.styles.display = "block"
         bottom.switch_tab(target_tab)
 
         if target_tab == "output":
-            bottom.log_output(f"\n[bold green]▶ Uruchamianie:[/] [cyan]{cmd}[/]\n")
+            bottom.log_output(f"\n[bold green]▶ Running:[/] [cyan]{cmd}[/]\n")
         
         try:
             process = await asyncio.create_subprocess_shell(
@@ -386,17 +386,17 @@ class CliCodeApp(App):
             )
             ret = await process.wait()
             status_color = "green" if ret == 0 else "red"
-            msg = f"\n[{status_color}]■ Zakończono z kodem {ret}[/{status_color}]\n"
+            msg = f"\n[{status_color}]■ Finished with exit code {ret}[/{status_color}]\n"
             if target_tab == "output":
                 bottom.log_output(msg)
             else:
                 bottom.query_one("#term-log").write(msg)
 
-            # Odświeżenie repozytorium git i drzewa plików
+            # Refresh git repo status and file tree
             top = self.query_one("#top-bar", TopBar)
             top.update_info(git_info=get_git_info(self.project_dir))
             sidebar = self.query_one("#sidebar", Sidebar)
             sidebar.reload()
 
         except Exception as e:
-            bottom.log_output(f"[bold red]Błąd wykonania polecenia:[/] {e}", is_error=True)
+            bottom.log_output(f"[bold red]Command execution error:[/] {e}", is_error=True)

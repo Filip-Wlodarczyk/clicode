@@ -6,10 +6,10 @@ from pathlib import Path
 
 
 def get_git_info(path: Path | str) -> dict[str, str]:
-    """Zwraca informacje o repozytorium git dla danej ścieżki."""
+    """Returns git repository information for the given path."""
     try:
         p = Path(path).resolve()
-        # Sprawdzenie czy w repo
+        # Check if inside repo
         root_res = subprocess.run(
             ["git", "rev-parse", "--show-toplevel"],
             cwd=p,
@@ -23,7 +23,7 @@ def get_git_info(path: Path | str) -> dict[str, str]:
         repo_root = Path(root_res.stdout.strip())
         repo_name = repo_root.name
 
-        # Pobranie gałęzi
+        # Get branch
         branch_res = subprocess.run(
             ["git", "branch", "--show-current"],
             cwd=p,
@@ -33,7 +33,7 @@ def get_git_info(path: Path | str) -> dict[str, str]:
         )
         branch = branch_res.stdout.strip()
         if not branch:
-            # Może detached HEAD
+            # Might be detached HEAD
             head_res = subprocess.run(
                 ["git", "rev-parse", "--short", "HEAD"],
                 cwd=p,
@@ -43,7 +43,7 @@ def get_git_info(path: Path | str) -> dict[str, str]:
             )
             branch = head_res.stdout.strip() or "HEAD"
 
-        # Sprawdzenie czy są zmiany (dirty)
+        # Check if working directory is dirty
         status_res = subprocess.run(
             ["git", "status", "--porcelain"],
             cwd=p,

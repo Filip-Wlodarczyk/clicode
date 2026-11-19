@@ -6,7 +6,7 @@ from textual.widgets import Static
 
 
 class TopBar(Horizontal):
-    """Górny pasek informacyjny: Repo Git, Nazwa Projektu, Język i Status."""
+    """Top status bar: Git Repo, Project Name, File, Language and Mode."""
 
     DEFAULT_CSS = """
     TopBar {
@@ -51,8 +51,8 @@ class TopBar(Horizontal):
         self,
         project_name: str = "",
         git_info: dict | None = None,
-        file_name: str = "Brak otwartego pliku",
-        language: str = "Brak",
+        file_name: str = "No file open",
+        language: str = "None",
         mode: str = "NORMAL",
         **kwargs,
     ):
@@ -71,14 +71,14 @@ class TopBar(Horizontal):
         yield Static("", classes="spacer")
         yield Static(self._format_lang(), id="top-lang", classes="top-section badge-lang")
         yield Static(self._format_mode(), id="top-mode", classes="top-section badge-mode")
-        yield Static("[Spacja: Menu]", classes="shortcut-hint")
+        yield Static("[Space: Menu]", classes="shortcut-hint")
 
     def _format_project(self) -> str:
         return f"📁 {self.project_name}"
 
     def _format_git(self) -> str:
         if not self.git_info.get("is_git"):
-            return "🌿 (brak repo)"
+            return "🌿 (no repo)"
         repo = self.git_info.get("repo_name", "")
         branch = self.git_info.get("branch", "")
         dirty = "*" if self.git_info.get("dirty") else ""

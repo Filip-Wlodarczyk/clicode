@@ -15,10 +15,10 @@ from clicode.core.diagnostics import Diagnostic
 
 
 class BottomPanel(Vertical):
-    """Dolny panel z zakładkami: Terminal, Output, Debug Console, Błędy."""
+    """Bottom panel with tabs: Terminal, Output, Debug Console, Problems."""
 
     class ErrorSelected(Message):
-        """Wiadomość wysyłana po kliknięciu błędu na liście."""
+        """Message emitted when an error row is clicked."""
         def __init__(self, file_path: str, line: int, column: int):
             super().__init__()
             self.file_path = file_path
@@ -26,7 +26,7 @@ class BottomPanel(Vertical):
             self.column = column
 
     class RunCommandRequested(Message):
-        """Wiadomość z prośbą o wykonanie polecenia w terminalu."""
+        """Message requesting command execution in terminal."""
         def __init__(self, command: str):
             super().__init__()
             self.command = command
@@ -88,7 +88,7 @@ class BottomPanel(Vertical):
                 yield RichLog(id="term-log", highlight=True, markup=True)
                 with Horizontal(id="terminal-input-bar"):
                     yield Static("$ ", id="term-prompt")
-                    yield Input(placeholder="Wpisz komendę shell i naciśnij Enter...", id="term-input")
+                    yield Input(placeholder="Type shell command and press Enter...", id="term-input")
 
             with TabPane("Output (2)", id="tab-output"):
                 yield RichLog(id="output-log", highlight=True, markup=True)
@@ -96,24 +96,24 @@ class BottomPanel(Vertical):
             with TabPane("Debug Console (3)", id="tab-debug"):
                 yield RichLog(id="debug-log", highlight=True, markup=True)
 
-            with TabPane("Błędy / Problems (4)", id="tab-problems"):
+            with TabPane("Problems (4)", id="tab-problems"):
                 yield DataTable(id="problems-table")
 
     def on_mount(self) -> None:
         table = self.query_one("#problems-table", DataTable)
         table.cursor_type = "row"
-        table.add_columns("Poziom", "Linia", "Kol", "Wiadomość", "Plik / Źródło")
+        table.add_columns("Severity", "Line", "Col", "Message", "File / Source")
         
-        # Wiadomość powitalna w terminalu i debug
+        # Welcome message in terminal and debug
         term_log = self.query_one("#term-log", RichLog)
-        term_log.write(f"[bold cyan]Wbudowany terminal clicode[/bold cyan] (katalog: {self.cwd})")
-        term_log.write("[dim]Wpisz polecenie w dolnym pasku terminala i zatwierdź Enterem.[/dim]\n")
+        term_log.write(f"[bold cyan]CliCode Embedded Terminal[/bold cyan] (cwd: {self.cwd})")
+        term_log.write("[dim]Type a command in the bottom input bar and press Enter.[/dim]\n")
 
         debug_log = self.query_one("#debug-log", RichLog)
-        debug_log.write("[green]✓ System diagnostyki i uruchamiania zainicjalizowany pomyślnie.[/green]")
+        debug_log.write("[green]✓ Diagnostics and runner system initialized successfully.[/green]")
 
     def switch_tab(self, tab_id: str) -> None:
-        """Przełącza aktywną zakładkę w panelu dolnym."""
+        """Switches active tab in bottom panel."""
         tabs = self.query_one("#bottom-tabs", TabbedContent)
         mapping = {
             "terminal": "tab-terminal",
@@ -134,7 +134,7 @@ class BottomPanel(Vertical):
             pass
 
     def log_output(self, text: str, is_error: bool = False) -> None:
-        """Wypisuje tekst do panelu Output."""
+        """Writes text to Output panel."""
         output = self.query_one("#output-log", RichLog)
         if is_error:
             output.write(f"[red]{text}[/red]")
@@ -142,7 +142,7 @@ class BottomPanel(Vertical):
             output.write(text)
 
     def log_debug(self, text: str) -> None:
-        """Wypisuje informację debugowania."""
+        """Writes debug message."""
         try:
             debug = self.query_one("#debug-log", RichLog)
             debug.write(f"[dim]{text}[/dim]")
@@ -150,24 +150,24 @@ class BottomPanel(Vertical):
             pass
 
     def update_diagnostics(self, diagnostics: list[Diagnostic]) -> None:
-        """Aktualizuje tabelę błędów / ostrzeżeń."""
+        """Updates problems/warnings table."""
         self.diagnostics_list = diagnostics
         table = self.query_one("#problems-table", DataTable)
         table.clear()
 
-        # Zaktualizuj etykietę zakładki
+        # Update tab label
         tabs = self.query_one("#bottom-tabs", TabbedContent)
         err_count = sum(1 for d in diagnostics if d.severity == "error")
         warn_count = sum(1 for d in diagnostics if d.severity == "warning")
 
         if not diagnostics:
-            table.add_row("[green]✓ Brak[/green]", "-", "-", "Brak wykrytych błędów składniowych i lintera.", "")
+            table.add_row("[green]✓ None[/green]", "-", "-", "No syntax or linter errors detected.", "")
             return
 
         for idx, d in enumerate(diagnostics):
             sev_badge = (
-                "[bold red]❌ BŁĄD[/bold red]" if d.severity == "error"
-                else "[yellow]⚠️ OSTRZ[/yellow]" if d.severity == "warning"
+                "[bold red]❌ ERROR[/bold red]" if d.severity == "error"
+                else "[yellow]⚠️ WARN[/yellow]" if d.severity == "warning"
                 else "[blue]ℹ️ INFO[/blue]"
             )
             file_disp = os.path.basename(d.file_path) if d.file_path else d.source
@@ -181,7 +181,7 @@ class BottomPanel(Vertical):
             )
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
-        """Obsługa kliknięcia wiersza z błędem w tabeli."""
+        """Handle clicking error row in table."""
         key = event.row_key.value
         try:
             idx = int(key)
@@ -192,7 +192,7 @@ class BottomPanel(Vertical):
             pass
 
     async def on_input_submitted(self, event: Input.Submitted) -> None:
-        """Wykonanie polecenia w terminalu po naciśnięciu Enter."""
+        """Execute command in terminal after pressing Enter."""
         cmd = event.value.strip()
         if not cmd:
             return

@@ -8,16 +8,16 @@ from textual.widgets import TextArea, Static
 
 
 class CodeEditor(Vertical):
-    """Główny obszar edytora kodu z paskiem statusu kursora."""
+    """Main code editor area with cursor status bar."""
 
     class ContentChanged(Message):
-        """Wysyłane gdy treść uległa zmianie."""
+        """Emitted when content has changed."""
         def __init__(self, is_dirty: bool):
             super().__init__()
             self.is_dirty = is_dirty
 
     class CursorMoved(Message):
-        """Wysyłane po zmianie pozycji kursora."""
+        """Emitted after cursor position changes."""
         def __init__(self, line: int, column: int):
             super().__init__()
             self.line = line
@@ -66,14 +66,14 @@ class CodeEditor(Vertical):
         )
         with Horizontal(id="editor-status-bar"):
             yield Static("Ln 1, Col 1", id="status-cursor", classes="status-item")
-            yield Static("0 linii", id="status-lines", classes="status-item")
+            yield Static("0 lines", id="status-lines", classes="status-item")
             yield Static("", classes="spacer")
             yield Static("UTF-8", classes="status-item")
-            yield Static("Spacje: 4", classes="status-item")
+            yield Static("Spaces: 4", classes="status-item")
             yield Static("Python", id="status-lang", classes="status-item")
 
     def load_file(self, file_path: Path | str) -> bool:
-        """Ładuje plik do edytora."""
+        """Loads a file into the editor."""
         p = Path(file_path).resolve()
         try:
             content = p.read_text(encoding="utf-8")
@@ -91,7 +91,7 @@ class CodeEditor(Vertical):
         ta = self.query_one("#code-text-area", TextArea)
         ta.text = content
 
-        # Wykrycie języka po rozszerzeniu
+        # Detect language by file extension
         detected_lang = self._detect_language(p.suffix)
         self.set_language(detected_lang)
         self._update_status()
@@ -99,7 +99,7 @@ class CodeEditor(Vertical):
         return True
 
     def save_file(self, target_path: Path | str | None = None) -> bool:
-        """Zapisuje treść edytora do pliku."""
+        """Saves editor content to file."""
         p = Path(target_path) if target_path else self.current_file
         if not p:
             return False
@@ -119,12 +119,12 @@ class CodeEditor(Vertical):
         return self.query_one("#code-text-area", TextArea).text
 
     def set_language(self, lang: str) -> None:
-        """Zmienia język podświetlania składni."""
+        """Changes syntax highlighting language."""
         self.current_language = lang
         ta = self.query_one("#code-text-area", TextArea)
-        # Mapowanie na dostępne języki TextArea
+        # Mapping to available TextArea languages
         ta_lang_map = {
-            "dart": "rust",  # zbliżona składnia c-like
+            "dart": "rust",  # similar c-like syntax
             "flutter": "rust",
             "typescript": "javascript",
             "js": "javascript",
@@ -141,17 +141,17 @@ class CodeEditor(Vertical):
             except Exception:
                 pass
         
-        # Aktualizacja etykiety w pasku statusu
+        # Update label in status bar
         try:
             self.query_one("#status-lang", Static).update(lang.capitalize())
         except Exception:
             pass
 
     def jump_to(self, line: int, column: int = 1) -> None:
-        """Przeskakuje kursorem do podanej linii i kolumny."""
+        """Jumps cursor to specified line and column."""
         ta = self.query_one("#code-text-area", TextArea)
         try:
-            # line i column są 1-indexed, cursor_location to (row, column) 0-indexed
+            # line and column are 1-indexed, cursor_location is (row, column) 0-indexed
             row = max(0, line - 1)
             col = max(0, column - 1)
             ta.cursor_location = (row, col)
@@ -161,14 +161,14 @@ class CodeEditor(Vertical):
             pass
 
     def on_text_area_changed(self, event: TextArea.Changed) -> None:
-        """Obsługa zmiany tekstu."""
+        """Handle text change."""
         ta = event.text_area
         is_dirty = (ta.text != self.saved_content)
         self.post_message(self.ContentChanged(is_dirty=is_dirty))
         self._update_status()
 
     def on_text_area_selection_changed(self, event: TextArea.SelectionChanged) -> None:
-        """Obsługa zmiany pozycji kursora."""
+        """Handle cursor position change."""
         self._update_status()
 
     def _update_status(self) -> None:
@@ -177,7 +177,7 @@ class CodeEditor(Vertical):
             row, col = ta.cursor_location
             total_lines = ta.document.line_count
             self.query_one("#status-cursor", Static).update(f"Ln {row + 1}, Col {col + 1}")
-            self.query_one("#status-lines", Static).update(f"{total_lines} linii")
+            self.query_one("#status-lines", Static).update(f"{total_lines} lines")
         except Exception:
             pass
 

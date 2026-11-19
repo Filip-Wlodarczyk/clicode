@@ -16,7 +16,7 @@ class RunCommand:
 
 
 def detect_run_commands(project_dir: Path | str, current_file: str | None = None) -> list[RunCommand]:
-    """Wykrywa i zwraca listę sugerowanych poleceń uruchomieniowych dla danego projektu."""
+    """Detects and returns a list of suggested run commands for the given project."""
     p = Path(project_dir).resolve()
     commands: list[RunCommand] = []
 
@@ -29,20 +29,20 @@ def detect_run_commands(project_dir: Path | str, current_file: str | None = None
         has_flutter = shutil.which("flutter") is not None
         if has_flutter:
             commands.extend([
-                RunCommand("Flutter Run", "flutter run", "Uruchom aplikację na domyślnym urządzeniu", "Flutter"),
-                RunCommand("Flutter Run (Linux)", "flutter run -d linux", "Uruchom natywną aplikację Linux", "Flutter"),
-                RunCommand("Flutter Run (Chrome)", "flutter run -d chrome", "Uruchom wersję webową w przeglądarce Chrome", "Flutter"),
-                RunCommand("Flutter Run with Dart Define", "flutter run --dart-define=FLAGA123=true", "Uruchom z flagą środowiskową --dart-define", "Flutter"),
-                RunCommand("Flutter Test", "flutter test", "Uruchom testy jednostkowe i widżetów", "Flutter"),
-                RunCommand("Flutter Pub Get", "flutter pub get", "Pobierz zależności projektu", "Flutter"),
-                RunCommand("Flutter Build APK", "flutter build apk", "Skompiluj pakiet APK na Androida", "Flutter"),
-                RunCommand("Flutter Analyze", "flutter analyze", "Sprawdź projekt pod kątem błędów i ostrzeżeń", "Flutter"),
+                RunCommand("Flutter Run", "flutter run", "Run app on default device", "Flutter"),
+                RunCommand("Flutter Run (Linux)", "flutter run -d linux", "Run native Linux app", "Flutter"),
+                RunCommand("Flutter Run (Chrome)", "flutter run -d chrome", "Run web version in Chrome", "Flutter"),
+                RunCommand("Flutter Run with Dart Define", "flutter run --dart-define=FLAG123=true", "Run with --dart-define environment flag", "Flutter"),
+                RunCommand("Flutter Test", "flutter test", "Run unit and widget tests", "Flutter"),
+                RunCommand("Flutter Pub Get", "flutter pub get", "Fetch project dependencies", "Flutter"),
+                RunCommand("Flutter Build APK", "flutter build apk", "Build Android APK package", "Flutter"),
+                RunCommand("Flutter Analyze", "flutter analyze", "Analyze project for errors and warnings", "Flutter"),
             ])
         else:
             commands.extend([
-                RunCommand("Dart Run", "dart run", "Uruchom główny program Dart", "Dart"),
-                RunCommand("Dart Test", "dart test", "Uruchom testy Dart", "Dart"),
-                RunCommand("Dart Analyze", "dart analyze", "Statyczna analiza kodu Dart", "Dart"),
+                RunCommand("Dart Run", "dart run", "Run main Dart program", "Dart"),
+                RunCommand("Dart Test", "dart test", "Run Dart tests", "Dart"),
+                RunCommand("Dart Analyze", "dart analyze", "Static analysis of Dart code", "Dart"),
             ])
 
     # 2. PYTHON
@@ -56,13 +56,13 @@ def detect_run_commands(project_dir: Path | str, current_file: str | None = None
     if is_python:
         if curr_rel and str(curr_rel).endswith(".py"):
             commands.append(
-                RunCommand(f"Python: Uruchom bieżący plik ({curr_rel})", f"python3 {curr_rel}", "Uruchom aktualnie otwarty plik Python", "Python")
+                RunCommand(f"Python: Run current file ({curr_rel})", f"python3 {curr_rel}", "Run currently open Python file", "Python")
             )
         if (p / "main.py").exists():
-            commands.append(RunCommand("Python: main.py", "python3 main.py", "Uruchom główny skrypt projektu", "Python"))
+            commands.append(RunCommand("Python: main.py", "python3 main.py", "Run main project script", "Python"))
         if (p / "app.py").exists():
-            commands.append(RunCommand("Python: app.py", "python3 app.py", "Uruchom aplikację app.py", "Python"))
-        commands.append(RunCommand("Python: Pytest", "pytest", "Uruchom testy jednostkowe pytest", "Python"))
+            commands.append(RunCommand("Python: app.py", "python3 app.py", "Run app.py application", "Python"))
+        commands.append(RunCommand("Python: Pytest", "pytest", "Run pytest unit tests", "Python"))
 
     # 3. NODE.JS / TYPESCRIPT
     pkg_json = p / "package.json"
@@ -73,48 +73,48 @@ def detect_run_commands(project_dir: Path | str, current_file: str | None = None
                 scripts = data.get("scripts", {})
                 for script_name in scripts.keys():
                     commands.append(
-                        RunCommand(f"npm run {script_name}", f"npm run {script_name}", f"Skrypt z package.json ({script_name})", "Node.js")
+                        RunCommand(f"npm run {script_name}", f"npm run {script_name}", f"Script from package.json ({script_name})", "Node.js")
                     )
         except Exception:
-            commands.append(RunCommand("npm start", "npm start", "Uruchom projekt npm", "Node.js"))
-            commands.append(RunCommand("npm test", "npm test", "Uruchom testy npm", "Node.js"))
+            commands.append(RunCommand("npm start", "npm start", "Run npm project", "Node.js"))
+            commands.append(RunCommand("npm test", "npm test", "Run npm tests", "Node.js"))
 
     # 4. RUST
     cargo_toml = p / "Cargo.toml"
     if cargo_toml.exists():
         commands.extend([
-            RunCommand("Cargo Run", "cargo run", "Skompiluj i uruchom projekt Rust", "Rust"),
-            RunCommand("Cargo Test", "cargo test", "Uruchom testy Cargo", "Rust"),
-            RunCommand("Cargo Build", "cargo build", "Skompiluj projekt", "Rust"),
-            RunCommand("Cargo Check", "cargo check", "Szybka weryfikacja poprawności kodu", "Rust"),
+            RunCommand("Cargo Run", "cargo run", "Compile and run Rust project", "Rust"),
+            RunCommand("Cargo Test", "cargo test", "Run Cargo tests", "Rust"),
+            RunCommand("Cargo Build", "cargo build", "Compile project", "Rust"),
+            RunCommand("Cargo Check", "cargo check", "Fast code validity check", "Rust"),
         ])
 
     # 5. GO
     go_mod = p / "go.mod"
     if go_mod.exists():
         commands.extend([
-            RunCommand("Go Run", "go run .", "Uruchom projekt Go", "Go"),
-            RunCommand("Go Test", "go test ./...", "Uruchom testy projektu", "Go"),
-            RunCommand("Go Build", "go build", "Skompiluj binarkę Go", "Go"),
+            RunCommand("Go Run", "go run .", "Run Go project", "Go"),
+            RunCommand("Go Test", "go test ./...", "Run project tests", "Go"),
+            RunCommand("Go Build", "go build", "Compile Go binary", "Go"),
         ])
 
     # 6. MAKEFILE / C / C++
     makefile = p / "Makefile"
     if makefile.exists():
         commands.extend([
-            RunCommand("Make", "make", "Domyślny cel makefile", "Make"),
-            RunCommand("Make Test", "make test", "Uruchom testy make", "Make"),
-            RunCommand("Make Clean", "make clean", "Wyczyść pliki kompilacji", "Make"),
+            RunCommand("Make", "make", "Default makefile target", "Make"),
+            RunCommand("Make Test", "make test", "Run make tests", "Make"),
+            RunCommand("Make Clean", "make clean", "Clean build artifacts", "Make"),
         ])
 
     # 7. BASH / SHELL
     if curr_rel and str(curr_rel).endswith((".sh", ".bash")):
         commands.append(
-            RunCommand(f"Bash: Uruchom {curr_rel}", f"bash {curr_rel}", "Uruchom bieżący skrypt powłoki", "Shell")
+            RunCommand(f"Bash: Run {curr_rel}", f"bash {curr_rel}", "Run current shell script", "Shell")
         )
 
-    # 8. Ogólne komendy git / info
-    commands.append(RunCommand("Git Status", "git status", "Pokaż status zmian git", "Git"))
-    commands.append(RunCommand("Git Diff", "git diff", "Pokaż wprowadzone zmiany", "Git"))
+    # 8. General git / info commands
+    commands.append(RunCommand("Git Status", "git status", "Show git changes status", "Git"))
+    commands.append(RunCommand("Git Diff", "git diff", "Show changes", "Git"))
 
     return commands

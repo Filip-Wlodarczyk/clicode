@@ -10,7 +10,7 @@ IGNORED_DIRS = {".git", ".venv", "node_modules", "__pycache__", ".dart_tool", "b
 
 
 class FilteredDirectoryTree(DirectoryTree):
-    """Drzewo katalogów filtrujące niepotrzebne foldery (np. .git, node_modules)."""
+    """Directory tree filtering ignored folders (e.g. .git, node_modules)."""
 
     def filter_paths(self, paths: list[Path]) -> list[Path]:
         return [
@@ -20,7 +20,7 @@ class FilteredDirectoryTree(DirectoryTree):
 
 
 class Sidebar(Vertical):
-    """Lewy panel boczny z drzewem plików projektu."""
+    """Left sidebar with project file tree."""
 
     DEFAULT_CSS = """
     Sidebar {
@@ -59,6 +59,6 @@ class Sidebar(Vertical):
         yield FilteredDirectoryTree(str(self.root_path), id="file-tree")
 
     def reload(self) -> None:
-        """Odświeża drzewo plików."""
+        """Reloads file tree."""
         tree = self.query_one("#file-tree", FilteredDirectoryTree)
         tree.reload()

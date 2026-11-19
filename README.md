@@ -1,74 +1,88 @@
 # CLI Code 💻🚀
 
-Nowoczesny, szybki i funkcjonalny edytor kodu w terminalu (Linux TUI Code Editor).
+Modern, fast, and feature-rich terminal code editor (Linux TUI Code Editor).
 
-## 🌟 Funkcje
+## 🌟 Features
 
-- **Drzewo plików projektu** po lewej stronie z filtrowaniem i natychmiastowym otwieraniem plików.
-- **Górny pasek informacyjny**:
-  - Nazwa projektu i katalogu
-  - Repozytorium Git i aktywna gałąź (ze statusem zmian dirty/clean `*`)
-  - Aktywny plik i wskaźnik niezapisanych zmian `●`
-  - Bieżący język programowania
-  - Tryb edytora (`NORMAL` / `EDIT`)
-- **Dolny pasek paneli (`Spacja + t`)**:
-  - `Terminal`: wbudowana interaktywna konsola powłoki do wykonywania poleceń
-  - `Output`: strumień wyjściowy uruchamianych zadań i projektów
-  - `Debug Console`: logi i historia zdarzeń
-  - `Błędy / Problems`: tabela z błędami i ostrzeżeniami lintera/kompilatora; kliknięcie przenosi kursor prosto do linii błędu!
-- **Wybór języka (`Spacja + l`)**:
-  - Obsługa Python, Dart / Flutter, JavaScript, TypeScript, Rust, Go, C/C++, Bash, JSON, YAML, TOML i innych.
-  - Automatyczna analiza kodu przez zainstalowane narzędzia systemowe (`dart analyze`, `python3`, `ruff`, `gcc`, itp.).
-- **Uruchamianie projektu (`Spacja + r`)**:
-  - Inteligentne wykrywanie projektów:
-    - **Flutter**: `flutter run`, `flutter run -d linux`, `flutter run -d chrome`, `flutter run --dart-define=FLAGA123=true`, `flutter test`, `flutter pub get`
-    - **Python**: `python3 <plik>`, `pytest`, `python3 main.py`
-    - **Node.js**: skrypty z `package.json` (`npm start`, `npm run dev`, `npm test`)
+- **Project file tree** on the left with filtering and instant file opening.
+- **Top status bar**:
+  - Project and directory name
+  - Git repository and active branch (with dirty/clean status `*`)
+  - Active file and unsaved changes indicator `●`
+  - Current programming language
+  - Editor mode (`NORMAL` / `EDIT`)
+- **Bottom panel bar (`Space + t`)**:
+  - `Terminal`: built-in interactive shell console to run commands
+  - `Output`: stdout/stderr stream of executed tasks and projects
+  - `Debug Console`: logs and event history
+  - `Problems`: table with linter/compiler errors and warnings; clicking navigates directly to the error line!
+- **Language selection (`Space + l`)**:
+  - Support for Python, Dart / Flutter, JavaScript, TypeScript, Rust, Go, C/C++, Bash, JSON, YAML, TOML, and more.
+  - Automatic code analysis via installed system tools (`dart analyze`, `python3`, `ruff`, `gcc`, etc.).
+- **Project runner (`Space + r`)**:
+  - Smart project detection:
+    - **Flutter**: `flutter run`, `flutter run -d linux`, `flutter run -d chrome`, `flutter run --dart-define=FLAG123=true`, `flutter test`, `flutter pub get`
+    - **Python**: `python3 <file>`, `pytest`, `python3 main.py`
+    - **Node.js**: scripts from `package.json` (`npm start`, `npm run dev`, `npm test`)
     - **Rust**: `cargo run`, `cargo test`
     - **Go**: `go run .`, `go test`
-    - Dowolna własna komenda i flagi.
-- **Szybkie otwieranie plików (`Spacja + p` / `Ctrl + p`)**:
-  - Wyszukiwarka plików w projekcie z fuzzy searching.
-- **Tworzenie nowych plików (`Spacja + n`)**.
-- **Zapisywanie (`Spacja + w` / `Ctrl + s`)**.
-- **Pomoc i skróty (`Spacja + h` / `F1`)**.
+    - Any custom command and flags.
+- **Quick file finder (`Space + p` / `Ctrl + p`)**:
+  - Fast file search across the project.
+- **Create new files (`Space + n`)**.
+- **Saving (`Space + w` / `Ctrl + s`)**.
+- **Help and shortcuts (`Space + h` / `F1`)**.
 
 ---
 
-## ⌨️ Skróty klawiszowe
+## ⌨️ Keyboard Shortcuts
 
-| Skrót | Akcja |
+| Shortcut | Action |
 |---|---|
-| `Spacja + l` | Menu wyboru języka |
-| `Spacja + r` | Menu uruchomienia projektu |
-| `Spacja + t` | Przełączanie paneli dolnych (Terminal, Output, Debug, Błędy) |
-| `Spacja + p` | Szybkie szukanie i otwieranie plików |
-| `Spacja + w` | Zapisz plik |
-| `Spacja + n` | Nowy plik |
-| `Spacja + b` | Pokaż / ukryj pasek boczny z plikami |
-| `Spacja + h` / `F1` | Okno pomocy ze skrótami |
-| `Ctrl + S` | Zapisz plik |
-| `Ctrl + P` | Szukaj pliku |
-| `Ctrl + B` | Przełącz pasek boczny |
-| `Ctrl + T` | Przełącz panel dolny |
-| `Ctrl + Q` | Wyjdź z edytora |
-| `Esc` | Powrót do trybu NORMAL |
-| `i` / `Enter` | Przejście do trybu edycji (EDIT) |
+| `Space + l` | Select language menu |
+| `Space + r` | Run project menu |
+| `Space + t` | Switch bottom panels (Terminal, Output, Debug, Problems) |
+| `Space + p` | Quick search and open file |
+| `Space + w` | Save file |
+| `Space + n` | New file |
+| `Space + b` | Show / hide file sidebar |
+| `Space + h` / `F1` | Help and shortcuts window |
+| `Ctrl + S` | Save file |
+| `Ctrl + P` | Find file |
+| `Ctrl + B` | Toggle sidebar |
+| `Ctrl + T` | Toggle bottom panel |
+| `Ctrl + Q` | Quit editor |
+| `Esc` | Return to NORMAL mode |
+| `i` / `Enter` | Enter edit mode (EDIT) |
 
 ---
 
-## 🚀 Uruchomienie
+## 📦 Installation
 
-Możesz uruchomić edytor z dowolnego katalogu na dwa sposoby:
+To install CLI Code locally:
+
 ```bash
-cli code
-# lub
+git clone <repository-url>
+cd clicode
+pip install -e .
+```
+
+### Requirements
+- Python 3.10+
+- Terminal with truecolor support (e.g. Kitty, Alacritty, GNOME Terminal, WezTerm)
+
+---
+
+## 🚀 Usage
+
+You can launch the editor from any directory:
+```bash
 clicode
 ```
 
-Możesz też podać konkretny folder lub plik:
+You can also specify a target folder or file:
 ```bash
-cli code /sciezka/do/projektu
-# lub
-cli code main.py
+clicode /path/to/project
+# or
+clicode main.py
 ```

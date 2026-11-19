@@ -11,13 +11,13 @@ from clicode.app import CliCodeApp
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="clicode",
-        description="CLI Code - nowoczesny edytor kodu w terminalu (Linux TUI Code Editor)",
+        description="CLI Code - modern terminal code editor (Linux TUI Code Editor)",
     )
     parser.add_argument(
         "target",
         nargs="?",
         default=".",
-        help="Ścieżka do folderu projektu lub pliku do otwarcia (domyślnie bieżący folder)",
+        help="Path to project directory or file to open (defaults to current directory)",
     )
     parser.add_argument(
         "-v", "--version",
@@ -37,7 +37,7 @@ def main() -> None:
     elif target_path.is_dir():
         target_dir = target_path
     else:
-        # Może nowy plik do utworzenia
+        # Maybe a new file to create
         initial_file = target_path
         target_dir = target_path.parent
 

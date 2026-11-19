@@ -34,7 +34,7 @@ SUPPORTED_LANGUAGES = [
 
 
 class LanguagePickerModal(ModalScreen[str | None]):
-    """Modal wyboru języka programowania (Spacja + l)."""
+    """Modal for selecting programming language (Space + l)."""
 
     DEFAULT_CSS = """
     LanguagePickerModal {
@@ -68,8 +68,8 @@ class LanguagePickerModal(ModalScreen[str | None]):
 
     def compose(self) -> ComposeResult:
         with Vertical(id="lang-dialog"):
-            yield Label("🔤 Wybierz język projektu / pliku (Spacja + l):", id="lang-title")
-            yield Input(placeholder="Filtruj języki (np. dart, python, rust)...", id="lang-filter")
+            yield Label("🔤 Select project / file language (Space + l):", id="lang-title")
+            yield Input(placeholder="Filter languages (e.g. dart, python, rust)...", id="lang-filter")
             yield OptionList(id="lang-list")
 
     def on_mount(self) -> None:
@@ -87,14 +87,14 @@ class LanguagePickerModal(ModalScreen[str | None]):
             if f_lower and f_lower not in name.lower() and f_lower not in lid:
                 continue
 
-            # Sprawdzenie dostępnych narzędzi w systemie
+            # Check available tools in system PATH
             installed = [t for t in item["tools"] if shutil.which(t)]
             if installed:
                 status = f"[green]✓ {', '.join(installed)}[/green]"
             else:
-                status = "[dim]wbudowany parser[/dim]"
+                status = "[dim]built-in parser[/dim]"
 
-            label = f"[bold]{name}[/bold]  [dim]({item['ext']})[/dim]  |  Narzędzia: {status}"
+            label = f"[bold]{name}[/bold]  [dim]({item['ext']})[/dim]  |  Tools: {status}"
             option_list.add_option(Option(prompt=label, id=lid))
 
     def on_input_changed(self, event: Input.Changed) -> None:
@@ -109,7 +109,7 @@ class LanguagePickerModal(ModalScreen[str | None]):
 
 
 class RunPickerModal(ModalScreen[str | None]):
-    """Modal wyboru komendy uruchomienia (Spacja + r)."""
+    """Modal for selecting run command (Space + r)."""
 
     DEFAULT_CSS = """
     RunPickerModal {
@@ -151,10 +151,10 @@ class RunPickerModal(ModalScreen[str | None]):
 
     def compose(self) -> ComposeResult:
         with Vertical(id="run-dialog"):
-            yield Label("🚀 Uruchom projekt / zadanie (Spacja + r):", id="run-title")
-            yield Input(placeholder="Wpisz własną komendę lub flagi (np. flutter run --dart-define=FLAGA123=true)...", id="custom-cmd-input")
+            yield Label("🚀 Run project / task (Space + r):", id="run-title")
+            yield Input(placeholder="Type custom command or flags (e.g. flutter run --dart-define=FLAG123=true)...", id="custom-cmd-input")
             yield OptionList(id="run-list")
-            yield Label("[Enter] Wybierz / Uruchom  |  [Esc] Anuluj", id="run-hint")
+            yield Label("[Enter] Select / Run  |  [Esc] Cancel", id="run-hint")
 
     def on_mount(self) -> None:
         option_list = self.query_one("#run-list", OptionList)
@@ -179,7 +179,7 @@ class RunPickerModal(ModalScreen[str | None]):
 
 
 class BottomPanelPickerModal(ModalScreen[str | None]):
-    """Menu wyboru dolnego panelu (Spacja + t): Terminal, Output, Debug, Błędy."""
+    """Menu for selecting bottom panel (Space + t): Terminal, Output, Debug, Problems."""
 
     DEFAULT_CSS = """
     BottomPanelPickerModal {
@@ -207,13 +207,13 @@ class BottomPanelPickerModal(ModalScreen[str | None]):
 
     def compose(self) -> ComposeResult:
         with Vertical(id="panel-dialog"):
-            yield Label("🖥️ Wybierz widok panelu dolnego (Spacja + t):", id="panel-title")
+            yield Label("🖥️ Select bottom panel view (Space + t):", id="panel-title")
             yield OptionList(
-                Option("[bold green]1. Terminal[/bold green]          - Interaktywna powłoka shell", id="terminal"),
-                Option("[bold cyan]2. Output[/bold cyan]            - Wyjście uruchomień i zadań", id="output"),
-                Option("[bold magenta]3. Debug Console[/bold magenta]     - Konsola debugowania i logów", id="debug"),
-                Option("[bold red]4. Błędy / Problems[/bold red] - Lista błędów i ostrzeżeń lintera", id="problems"),
-                Option("[bold yellow]5. Przełącz / Ukryj[/bold yellow]   - Schowaj lub pokaż panel dolny", id="toggle"),
+                Option("[bold green]1. Terminal[/bold green]          - Interactive shell console", id="terminal"),
+                Option("[bold cyan]2. Output[/bold cyan]            - Run and task output", id="output"),
+                Option("[bold magenta]3. Debug Console[/bold magenta]     - Debug console and logs", id="debug"),
+                Option("[bold red]4. Problems[/bold red]          - Linter errors and warnings list", id="problems"),
+                Option("[bold yellow]5. Toggle / Hide[/bold yellow]     - Show or hide bottom panel", id="toggle"),
                 id="panel-list",
             )
 
@@ -234,7 +234,7 @@ class BottomPanelPickerModal(ModalScreen[str | None]):
 
 
 class FileFinderModal(ModalScreen[str | None]):
-    """Szybkie wyszukiwanie plików w projekcie (Spacja + p / Ctrl+p)."""
+    """Quick file finder in project (Space + p / Ctrl+p)."""
 
     DEFAULT_CSS = """
     FileFinderModal {
@@ -273,8 +273,8 @@ class FileFinderModal(ModalScreen[str | None]):
 
     def compose(self) -> ComposeResult:
         with Vertical(id="finder-dialog"):
-            yield Label("🔍 Szybkie otwarcie pliku (Spacja + p):", id="finder-title")
-            yield Input(placeholder="Wpisz fragment nazwy pliku...", id="finder-input")
+            yield Label("🔍 Quick open file (Space + p):", id="finder-title")
+            yield Input(placeholder="Type file name fragment...", id="finder-input")
             yield OptionList(id="finder-list")
 
     def on_mount(self) -> None:
@@ -313,7 +313,7 @@ class FileFinderModal(ModalScreen[str | None]):
 
 
 class NewFileModal(ModalScreen[str | None]):
-    """Tworzenie nowego pliku (Spacja + n)."""
+    """Create a new file (Space + n)."""
 
     DEFAULT_CSS = """
     NewFileModal {
@@ -341,8 +341,8 @@ class NewFileModal(ModalScreen[str | None]):
 
     def compose(self) -> ComposeResult:
         with Vertical(id="newfile-dialog"):
-            yield Label("📄 Utwórz nowy plik:", id="newfile-title")
-            yield Input(placeholder="Wpisz nazwę (np. main.py, lib/app.dart)...", id="newfile-input")
+            yield Label("📄 Create new file:", id="newfile-title")
+            yield Input(placeholder="Enter name (e.g. main.py, lib/app.dart)...", id="newfile-input")
 
     def on_mount(self) -> None:
         self.query_one("#newfile-input", Input).focus()
@@ -360,7 +360,7 @@ class NewFileModal(ModalScreen[str | None]):
 
 
 class HelpModal(ModalScreen[None]):
-    """Menu pomocy ze skrótami klawiszowymi (Spacja + h / F1)."""
+    """Help menu with keyboard shortcuts (Space + h / F1)."""
 
     DEFAULT_CSS = """
     HelpModal {
@@ -389,33 +389,33 @@ class HelpModal(ModalScreen[None]):
     """
 
     HELP_TEXT = """
-[bold yellow]CLI CODE - Przewodnik po skrótach klawiszowych:[/bold yellow]
+[bold yellow]CLI CODE - Keyboard Shortcuts Guide:[/bold yellow]
 
-[bold cyan]Menu Lidera (naciśnij Spację w trybie NORMAL lub Ctrl+Space):[/bold cyan]
-  [bold]Spacja + l[/bold] : Wybór języka (zmienia składnię i uruchamia diagnostykę)
-  [bold]Spacja + r[/bold] : Uruchom projekt (komendy Flutter, Python, Node, Cargo itp.)
-  [bold]Spacja + t[/bold] : Menu dolnych paneli (Terminal, Output, Debug, Błędy)
-  [bold]Spacja + p[/bold] : Szybkie wyszukiwanie plików w projekcie
-  [bold]Spacja + w[/bold] : Zapisz bieżący plik
-  [bold]Spacja + n[/bold] : Utwórz nowy plik
-  [bold]Spacja + b[/bold] : Pokaż / ukryj lewy pasek boczny z plikami
-  [bold]Spacja + h[/bold] : To okno pomocy
+[bold cyan]Leader Menu (press Space in NORMAL mode or Ctrl+Space):[/bold cyan]
+  [bold]Space + l[/bold] : Select language (changes syntax and runs diagnostics)
+  [bold]Space + r[/bold] : Run project (Flutter, Python, Node, Cargo commands etc.)
+  [bold]Space + t[/bold] : Bottom panels menu (Terminal, Output, Debug, Problems)
+  [bold]Space + p[/bold] : Quick search and open files in project
+  [bold]Space + w[/bold] : Save current file
+  [bold]Space + n[/bold] : Create new file
+  [bold]Space + b[/bold] : Show / hide left sidebar with files
+  [bold]Space + h[/bold] : This help window
 
-[bold cyan]Skróty bezpośrednie:[/bold cyan]
-  [bold]Ctrl + S[/bold]   : Zapisz plik
-  [bold]Ctrl + P[/bold]   : Szukaj pliku
-  [bold]Ctrl + B[/bold]   : Przełącz pasek boczny
-  [bold]Ctrl + T[/bold]   : Przełącz panel dolny
-  [bold]Ctrl + Q[/bold]   : Wyjdź z edytora
-  [bold]Esc[/bold]        : Powrót do trybu NORMAL ze skrótami Spacji
-  [bold]i / Enter[/bold]  : Przejście do edycji tekstu
+[bold cyan]Direct Shortcuts:[/bold cyan]
+  [bold]Ctrl + S[/bold]   : Save file
+  [bold]Ctrl + P[/bold]   : Find file
+  [bold]Ctrl + B[/bold]   : Toggle sidebar
+  [bold]Ctrl + T[/bold]   : Toggle bottom panel
+  [bold]Ctrl + Q[/bold]   : Quit editor
+  [bold]Esc[/bold]        : Return to NORMAL mode (Space shortcuts active)
+  [bold]i / Enter[/bold]  : Enter text edit mode (EDIT)
 
-Naciśnij [bold green]Esc[/bold green] lub [bold green]Enter[/bold green], aby zamknąć to okno.
+Press [bold green]Esc[/bold green] or [bold green]Enter[/bold green] to close this window.
 """
 
     def compose(self) -> ComposeResult:
         with Vertical(id="help-dialog"):
-            yield Label("💡 Pomoc i skróty CLI Code", id="help-title")
+            yield Label("💡 CLI Code Help and Shortcuts", id="help-title")
             yield Static(self.HELP_TEXT, id="help-content")
 
     def on_key(self, event) -> None:

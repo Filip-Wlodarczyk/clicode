@@ -21,12 +21,12 @@ class Diagnostic:
 
 
 def run_diagnostics(file_path: str | Path | None, content: str, language: str) -> list[Diagnostic]:
-    """Uruchamia diagnostykę dla danego pliku/kodu korzystając z zainstalowanych narzędzi."""
+    """Runs diagnostics for the given file/code using installed tools."""
     diagnostics: list[Diagnostic] = []
     lang = (language or "").lower().strip()
     path_str = str(file_path) if file_path else ""
 
-    # Przygotowanie pliku tymczasowego jeśli plik nie jest zapisany na dysku
+    # Prepare temporary file if not saved to disk
     temp_file: str | None = None
     target_path = path_str
     if not path_str or not os.path.exists(path_str):
@@ -58,7 +58,7 @@ def run_diagnostics(file_path: str | Path | None, content: str, language: str) -
         elif lang in ("toml",):
             diagnostics.extend(_check_toml(content))
         else:
-            # Ogólny fallback w zależności od rozszerzenia
+            # Generic fallback based on extension
             if target_path.endswith(".dart"):
                 diagnostics.extend(_check_dart(target_path))
             elif target_path.endswith(".py"):
@@ -97,7 +97,7 @@ def _get_suffix_for_lang(lang: str) -> str:
 def _check_python(path: str, content: str) -> list[Diagnostic]:
     diags: list[Diagnostic] = []
     
-    # 1. Sprawdzenie kompilacji Python
+    # 1. Python compilation check
     try:
         compile(content, path or "<buffer>", "exec")
     except SyntaxError as e:
@@ -125,7 +125,7 @@ def _check_python(path: str, content: str) -> list[Diagnostic]:
         )
         return diags
 
-    # 2. Jeśli jest flake8 / ruff w systemie
+    # 2. Check if flake8 / ruff is installed in system
     if shutil.which("ruff"):
         try:
             res = subprocess.run(
